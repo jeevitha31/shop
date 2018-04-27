@@ -37,7 +37,7 @@ class NovalnetOrderConfirmationDataProvider
      * @param Arguments $arg
      * @return string
      */
-    public function call(Twig $twig, $args)
+    public function call(Twig $twig,PaymentRepositoryContract $paymentRepositoryContract, $args)
     {
         $paymentHelper = pluginApp(PaymentHelper::class);
         $paymentMethodId = $paymentHelper->getPaymentMethod();
