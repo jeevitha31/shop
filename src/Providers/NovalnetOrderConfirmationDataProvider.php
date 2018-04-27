@@ -34,6 +34,7 @@ class NovalnetOrderConfirmationDataProvider
      * Setup the Novalnet transaction comments for the requested order
      *
      * @param Twig $twig
+     * @param PaymentRepositoryContract $PaymentRepositoryContract
      * @param Arguments $arg
      * @return string
      */
@@ -43,28 +44,12 @@ class NovalnetOrderConfirmationDataProvider
         $paymentMethodId = $paymentHelper->getPaymentMethod();
         $order = $args[0];
         $payments		=	$paymentRepositoryContract->getPaymentsByOrderId($order['id']);
-        $paymentHelper->testLogTest('CHECK',$order);
-        $paymentHelper->testLogTest('CHECK2',$payments);
-        $paymentHelper->testLogTest('CHECK3',$paymentMethodId);
-       // if(isset($order->order))
-        //    $order = $order->order;
-        
-        //$properties = !empty($order->properties) ? $order->properties : $order['properties'];
-       // $properties = $order->properties;//!empty($order->properties) ? $order->properties : $order['properties'];
-        //$paymentHelper->testLogTest('CHECK4FINAL',$properties);
-
+       
         foreach($payments as $payment)
-        {
-           
-            $paymentHelper->testLogTest('CHECKKKK','test'); 
-            $paymentHelper->testLogTest('CHECKOBJ',$payment->mopId);                 
-          // $paymentHelper->testLogTest('CHECKOBJVAL',$property->value);                
-            //$paymentHelper->testLogTest('CHECKOBJTYPE',$property->typeId);
-            //if($property->typeId == '3' && $property->value == $paymentMethodId)
+        {             
+       
             if( $paymentMethodId == $payment->mopId)
             {
-               // $paymentHelper->testLogTest('CHECK5VAL',$property->value);                
-                //$orderId = (int) $order->id;
                 $orderId = (int) $payment->order['orderId'];
 
                 $authHelper = pluginApp(AuthHelper::class);
@@ -75,16 +60,14 @@ class NovalnetOrderConfirmationDataProvider
                             return $commentsObj->listComments();
                         }
                 );
-                $paymentHelper->testLogTest('CHECK7CMD',$orderId);
-                $paymentHelper->testLogTest('CHECK6CMD',$orderComments);
-            $paymentHelper->testLogTest('CHECK8CMD',$order->id);
+               
                 $comment = '';
                 foreach($orderComments as $data)
                 {
                     $comment .= (string)$data->text;
                     $comment .= '</br>';
                 }
-$comment .= 'commenttest12345';
+
                 return $twig->render('Novalnet::NovalnetOrderHistory', ['comments' => html_entity_decode($comment)]);
             }
         }
