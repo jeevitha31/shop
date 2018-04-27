@@ -65,7 +65,7 @@ class NovalnetPaymentMethod
                                   'name'       => 'Novalnet'];
           $this->getLogger(__METHOD__)->error('migratoncall', $paymentMethodData);
                                   
-            $this->paymentMethodRepository->NovalnetPaymentMethod($paymentMethodData);
+            $this->paymentMethodRepository->CreatePaymentMethod($paymentMethodData);
        
     }
 }
