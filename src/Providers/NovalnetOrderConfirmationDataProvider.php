@@ -42,7 +42,7 @@ class NovalnetOrderConfirmationDataProvider
     {
         $paymentHelper = pluginApp(PaymentHelper::class);
 	$sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
-       $paymentMethodId =(int)$paymentHelper->getPaymentMethod();
+       $paymentMethodId = $paymentHelper->getPaymentMethod();
         $order = $arg[0];
         
         
