@@ -19,6 +19,9 @@ use Plenty\Plugin\Templates\Twig;
 use Novalnet\Helper\PaymentHelper;
 use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
 use \Plenty\Modules\Authorization\Services\AuthHelper;
+use Plenty\Modules\Order\Models\Order;
+use Plenty\Modules\Payment\Models\Payment;
+use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 
 /**
  * Class NovalnetOrderConfirmationDataProvider
@@ -39,29 +42,30 @@ class NovalnetOrderConfirmationDataProvider
         $paymentHelper = pluginApp(PaymentHelper::class);
         $paymentMethodId = $paymentHelper->getPaymentMethod();
         $order = $args[0];
+        $payments		=	$paymentRepositoryContract->getPaymentsByOrderId($order['id']);
         $paymentHelper->testLogTest('CHECK',$order);
-        $paymentHelper->testLogTest('CHECK2',$order->properties);
+        $paymentHelper->testLogTest('CHECK2',$payments);
         $paymentHelper->testLogTest('CHECK3',$paymentMethodId);
        // if(isset($order->order))
         //    $order = $order->order;
         
         //$properties = !empty($order->properties) ? $order->properties : $order['properties'];
-        $properties = $order->properties;//!empty($order->properties) ? $order->properties : $order['properties'];
-        $paymentHelper->testLogTest('CHECK4FINAL',$properties);
+       // $properties = $order->properties;//!empty($order->properties) ? $order->properties : $order['properties'];
+        //$paymentHelper->testLogTest('CHECK4FINAL',$properties);
 
-        foreach($properties as $property)
+        foreach($payments as $payment)
         {
-            $property = (object)$property;
+           
             $paymentHelper->testLogTest('CHECKKKK','test'); 
-            $paymentHelper->testLogTest('CHECKOBJ',is_string($property));                 
-            $paymentHelper->testLogTest('CHECKOBJVAL',$property->value);                
-            $paymentHelper->testLogTest('CHECKOBJTYPE',$property->typeId);
+            $paymentHelper->testLogTest('CHECKOBJ',$payment->mopId);                 
+          // $paymentHelper->testLogTest('CHECKOBJVAL',$property->value);                
+            //$paymentHelper->testLogTest('CHECKOBJTYPE',$property->typeId);
             //if($property->typeId == '3' && $property->value == $paymentMethodId)
-            if($property->typeId == 3)
+            if( $paymentMethodId == $payment->mopId)
             {
-                $paymentHelper->testLogTest('CHECK5VAL',$property->value);                
+               // $paymentHelper->testLogTest('CHECK5VAL',$property->value);                
                 //$orderId = (int) $order->id;
-                $orderId = (int) $property->orderId;
+                $orderId = (int) $payment->order['orderId'];
 
                 $authHelper = pluginApp(AuthHelper::class);
                 $orderComments = $authHelper->processUnguarded(
@@ -80,7 +84,7 @@ class NovalnetOrderConfirmationDataProvider
                     $comment .= (string)$data->text;
                     $comment .= '</br>';
                 }
-$comment .= 'commenttest';
+$comment .= 'commenttest12345';
                 return $twig->render('Novalnet::NovalnetOrderHistory', ['comments' => html_entity_decode($comment)]);
             }
         }
