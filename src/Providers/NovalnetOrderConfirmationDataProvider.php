@@ -17,12 +17,8 @@ namespace Novalnet\Providers;
 use Plenty\Plugin\Templates\Twig;
 
 use Novalnet\Helper\PaymentHelper;
-use Plenty\Modules\Order\Models\Order;
-use Plenty\Modules\Payment\Models\Payment;
 use Plenty\Modules\Comment\Contracts\CommentRepositoryContract;
-use Plenty\Modules\Payment\Contracts\PaymentRepositoryContract;
 use \Plenty\Modules\Authorization\Services\AuthHelper;
-use Plenty\Modules\Frontend\Session\Storage\Contracts\FrontendSessionStorageFactoryContract;
 
 /**
  * Class NovalnetOrderConfirmationDataProvider
@@ -38,35 +34,34 @@ class NovalnetOrderConfirmationDataProvider
      * @param Arguments $arg
      * @return string
      */
-    public function call(Twig $twig, PaymentRepositoryContract $paymentRepositoryContract, $arg)
+    public function call(Twig $twig, $args)
     {
         $paymentHelper = pluginApp(PaymentHelper::class);
-	$sessionStorage = pluginApp(FrontendSessionStorageFactoryContract::class);
-       $paymentMethodId = $paymentHelper->getPaymentMethod();
-        $order = $arg[0];
-        
+        //$paymentMethodId = $paymentHelper->getPaymentMethod();
+        $order = $args[0];
+        $paymentHelper->testLogTest('CHECK',$order);
+        $paymentHelper->testLogTest('CHECK2',$order->properties);
+        $paymentHelper->testLogTest('CHECK3',$order['properties']);
+       // if(isset($order->order))
+        //    $order = $order->order;
         
         //$properties = !empty($order->properties) ? $order->properties : $order['properties'];
-        //$properties = $order->properties;//!empty($order->properties) ? $order->properties : $order['properties'];
-        $paymentHelper->testLogTest('CHECK4FINAL',$paymentMethodId);
-        $paymentHelper->testLogTest('orderid1',$order->id);
-        $paymentHelper->testLogTest('orderid2',$order['id']);
-         $orderno = $order['id'];
-		$payments = $paymentRepositoryContract->getPaymentsByOrderId($orderno);
-		$paymentHelper->testLogTest('paymentrepository',$payments);
-        foreach($payments as $payment)
+        $properties = $order->properties;//!empty($order->properties) ? $order->properties : $order['properties'];
+        $paymentHelper->testLogTest('CHECK4FINAL',$properties);
+
+        foreach($properties as $property)
         {
-          
-            $paymentHelper->testLogTest('CHECKKKK',$payment); 
-           // $paymentHelper->testLogTest('CHECKOBJ',is_string($property));                 
-            $paymentHelper->testLogTest('CHECKOBJVAL',$payment->mopId);                
-            //$paymentHelper->testLogTest('CHECKOBJTYPE',$payment->typeId);
+            $property = (object)$property;
+            $paymentHelper->testLogTest('CHECKKKK','test'); 
+            $paymentHelper->testLogTest('CHECKOBJ',is_string($property));                 
+            $paymentHelper->testLogTest('CHECKOBJVAL',$property->value);                
+            $paymentHelper->testLogTest('CHECKOBJTYPE',$property->typeId);
             //if($property->typeId == '3' && $property->value == $paymentMethodId)
-            if($paymentMethodId == $payment->mopId )
+            if($property->typeId == 3)
             {
-                //$paymentHelper->testLogTest('CHECK5VAL',$property->value);                
+                $paymentHelper->testLogTest('CHECK5VAL',$property->value);                
                 //$orderId = (int) $order->id;
-                $orderId = (int) $payment->order['orderId'];
+                $orderId = (int) $property->orderId;
 
                 $authHelper = pluginApp(AuthHelper::class);
                 $orderComments = $authHelper->processUnguarded(
@@ -85,10 +80,7 @@ class NovalnetOrderConfirmationDataProvider
                     $comment .= (string)$data->text;
                     $comment .= '</br>';
                 }
-		    $comment .= 'test_comment123';
-
-              $payment_type = (string)$paymentHelper->getPaymentKeyByMop($payment->mopId);
-
+$comment .= 'commenttest';
                 return $twig->render('Novalnet::NovalnetOrderHistory', ['comments' => html_entity_decode($comment)]);
             }
         }
