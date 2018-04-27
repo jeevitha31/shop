@@ -48,7 +48,7 @@ class NovalnetOrderConfirmationDataProvider
         
         //$properties = !empty($order->properties) ? $order->properties : $order['properties'];
         //$properties = $order->properties;//!empty($order->properties) ? $order->properties : $order['properties'];
-        $paymentHelper->testLogTest('CHECK4FINAL',$properties);
+        $paymentHelper->testLogTest('CHECK4FINAL',$paymentMethodId);
         $paymentHelper->testLogTest('orderid1',$order->id);
         $paymentHelper->testLogTest('orderid2',$order['id']);
          $orderno = $order['id'];
